@@ -10,11 +10,6 @@ import SwiftUI
 struct ContentView: View {
     // MARK: - DATA
     
-    @State private var choiceNumber : Int = 1
-    @State private var choiceDifficulty : Int = 0
-    @State private var positionInFormula : String = "c"
-    private var numberRounds : Int = 5
-    
     // Top Display
     @State private var isTopDisplayVisible = true
     @State private var isHorzFormulaVisible = true
@@ -30,8 +25,13 @@ struct ContentView: View {
     @State private var cHorz = "c"
     
     // middle display
-    @State private var interActiveText = "Don’t fall prey to shiny object syndrome. The lure of spending $100 on another course is high, I know, but you don’t learn anything by buying books. Your best chance of success is sticking with the 100 days shown here and really make it work, so if you’re already thinking “I can do this course at the same time as Other SwiftUI Course” you’re just setting yourself up to fail.."
+    @State private var isMidDisplayVisible = true
+    @State private var titleMidDisplay = ""
+    @State private var textPresented = ".."
     //bottom Digits
+    var numbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+    @State private var areDigitsVisible = true
+    
     @State private var digit = "0"
     @State private var digit1 = "𝟷"
     @State private var digit2 = "𝟤"
@@ -46,6 +46,41 @@ struct ContentView: View {
     @State private var digitR = ">"
     @State private var spaceBar = "⮐"
     
+    @State private var currentGameState = GameState.startScreen
+    // game states to cycle through > little too advanced whay I'm trying to do here
+    enum GameState {
+        case startScreen
+        case menuScreen
+        case modeSelect
+        case difficultySelect
+        case highScoreScreen
+        case preferencesScreen
+        case beginRound
+        case playRound
+        case pauseGame
+        case askQuestion
+        case answerQuestion
+        case scoreQuestion
+        case endRound
+        case scoreRound
+        case scoreBoard
+    }
+    
+    @State private var isMenuVisible = false
+    @State private var currentMenuItemSelect = 0
+    
+    enum GameMode {
+        case tableRun
+    }
+    
+    @State private var tableSelected : Int = 1
+    @State private var levelDifficulty : Int = 1
+    @State private var currentRound : Int = 0
+    @State private var currentQuestion : Int = 0
+    @State private var questionsCorrect : Int = 0
+    @State private var score : Int = 0
+    @State private var roundsCompleted = 0
+    
     // Alert pop up or .. off-screen ZLayer on top animates in and out
     
     
@@ -54,293 +89,265 @@ struct ContentView: View {
         
         ZStack {
             
-          
-                // behind the buttons color for when button invisible or animating
-                Color(.blue)
+            
+            // behind the buttons color for when button invisible or animating
+            Color(.blue)
                 .ignoresSafeArea()
                 .opacity(0.3)
+            
+            VStack {
+                
+                // background top 'screen' for Question formula a * b = c
+                ZStack {
+                    RoundedRectangle(cornerRadius: 25.0)
+                        .foregroundColor(.gray)
+                        .opacity(0.5)
+                    //                        .padding(.bottom)
                     
-                VStack {
                     
-                    // background top 'screen' for Question formula a * b = c
+                    
                     ZStack {
-                        RoundedRectangle(cornerRadius: 25.0)
-                            .foregroundColor(.gray)
-                            .opacity(0.5)
-//                        .padding(.bottom)
+                        // Top Display Text()
                         
-                        if isTopDisplayVisible {
-                            
-                            ZStack {
-                                // Top Display Text()
-                                
-                                if isVertFormulaVisible {
-                                    
-                                    Group {
-                                        // Top Display Vertical Formula
-                                        VStack{
-                                            Text(aVert)
-                                                .offset(y: 20)
-                                            HStack {
-                                                Text(bVert)
-                                                Text(mathOperator)
-                                                    .foregroundColor(operatorColor)
-                                            }
-                                            .offset(x: 15.0, y: 20)
-                                            Text("-----")
-                                            
-                                        }
-                                        //  Text(cVert)
-                                    } // end VSt formula
-                                
-                                    .offset(x: 7.0, y: -30)
-                                    // .font(.system(size: 36))
-                            }
-                                if isHorzFormulaVisible {
-                                HStack{
-                                    // formula horizontal display
-                                    Group{
-                                        Text(aHorz)
-                                        Text(mathOperator)
-                                            .foregroundColor(operatorColor)
-                                        Text(bHorz)
-                                        Text(isSign)
-                                            .foregroundColor(operatorColor)
-                                    }
-                                    .offset(x: -25, y: 0.0)
-                                    
-                                    Text(cHorz)
-                                }
-                                .offset(x: -55, y: 60.0)
-                                
-                
-                                    
-                                    // .offset(x: -55, y: 30.0)
-                              }
-                            } //end ZSt Top Display TEXT
-                            .font(.system(size: 44))
-                        } // end IF
-                           
-                    }  //end ZSt Top Display
-                
-                    // MARK: - MIDDLE DISPLAY
-                    // background black Middle display for animated Question / menu
-                    ZStack {
-                        // background
-                        RoundedRectangle(cornerRadius: 25.0)
-                            .foregroundColor(.black)
-                            .frame(width: 350, height: 140)
-                        .opacity(0.8)
-                        // text Layer:
-                        Text(interActiveText)
-                            .foregroundColor(.white)
-                            .frame(width: 300, height: 130)
-                    }
-                    
-                    
-                    // MARK: - Digits
-                    VStack {
-                        //  background for interaction buttons / digits
                         Group {
-                            HStack {
-                                // Toprow digit
-                                ZStack {
-                                    // D1
-                                    RoundedRectangle(cornerRadius: 25.0)
-                                        .foregroundColor(.black)
-                                        .opacity(0.5)
-                                        .frame(width: 100, height: 50, alignment: .center)
-                                    RoundedRectangle(cornerRadius: 25.0)
-                                        .foregroundColor(.black)
-                                        .opacity(0.7)
-                                        .frame(width: 80, height: 40, alignment: .center)
-                                    Button {
-                                        //action
-                                    } label: {
-                                        Text(digit1)
-                                            .font(.system(size: 32))
-                                            .foregroundColor(.white)
-                                    }
+                            // Top Display Vertical Formula
+                            VStack{
+                                Text(aVert)
+                                    .offset(y: 20)
+                                HStack {
+                                    Text(bVert)
+                                    Text(mathOperator)
+                                        .foregroundColor(operatorColor)
                                 }
-                                ZStack {
-                                    // D2
-                                    RoundedRectangle(cornerRadius: 25.0)
-                                        .foregroundColor(.black)
-                                        .opacity(0.5)
-                                        .frame(width: 100, height: 50, alignment: .center)
-                                    RoundedRectangle(cornerRadius: 25.0)
-                                        .foregroundColor(.black)
-                                        .opacity(0.7)
-                                        .frame(width: 80, height: 40, alignment: .center)
-                                    Button {
-                                        //action
-                                    } label: {
-                                        Text(digit2)
-                                            .font(.system(size: 32))
-                                            .foregroundColor(.white)
-                                    }
-                                }
-                                ZStack {
-                                    // D3
-                                    RoundedRectangle(cornerRadius: 25.0)
-                                        .foregroundColor(.black)
-                                        .opacity(0.5)
-                                        .frame(width: 100, height: 50, alignment: .center)
-                                    RoundedRectangle(cornerRadius: 25.0)
-                                        .foregroundColor(.black)
-                                        .opacity(0.7)
-                                        .frame(width: 80, height: 40, alignment: .center)
-                                    Button {
-                                        //action
-                                    } label: {
-                                        Text(digit3)
-                                            .font(.system(size: 32))
-                                            .foregroundColor(.white)
-                                    }
-                                }
+                                .offset(x: 15.0, y: 20)
+                                Text("-----")
+                                
+                            } .opacity(isVertFormulaVisible ? 1.0 : 0.0)
+                            //  Text(cVert)
+                        } // end VSt formula
+                        
+                        .offset(x: 7.0, y: -30)
+                        // .font(.system(size: 36))
+                        HStack{
+                            // formula horizontal display
+                            Group{
+                                Text(aHorz)
+                                Text(mathOperator)
+                                    .foregroundColor(operatorColor)
+                                Text(bHorz)
+                                Text(isSign)
+                                    .foregroundColor(operatorColor)
                             }
+                            .opacity(isHorzFormulaVisible ? 1.0 : 0.0)
+                            .offset(x: -25, y: 0.0)
                             
-                            HStack {
-                                // midrow digit
-                                ZStack {
-                                    // D4
-                                    RoundedRectangle(cornerRadius: 25.0)
-                                        .foregroundColor(.black)
-                                        .opacity(0.5)
-                                        .frame(width: 100, height: 50, alignment: .center)
-                                    RoundedRectangle(cornerRadius: 25.0)
-                                        .foregroundColor(.black)
-                                        .opacity(0.7)
-                                        .frame(width: 80, height: 40, alignment: .center)
-                                    Button {
-                                        //action
-                                    } label: {
-                                        Text(digit4)
-                                            .font(.system(size: 32))
-                                            .foregroundColor(.white)
-                                    }
-                                }
-                                ZStack {
-                                    // D5
-                                    RoundedRectangle(cornerRadius: 25.0)
-                                        .foregroundColor(.black)
-                                        .opacity(0.5)
-                                        .frame(width: 100, height: 50, alignment: .center)
-                                    RoundedRectangle(cornerRadius: 25.0)
-                                        .foregroundColor(.black)
-                                        .opacity(0.7)
-                                        .frame(width: 80, height: 40, alignment: .center)
-                                    Button {
-                                        //action
-                                    } label: {
-                                        Text(digit5)
-                                            .font(.system(size: 32))
-                                            .foregroundColor(.white)
-                                    }
-                                }
-                                ZStack {
-                                    // D6
-                                    RoundedRectangle(cornerRadius: 25.0)
-                                        .foregroundColor(.black)
-                                        .opacity(0.5)
-                                        .frame(width: 100, height: 50, alignment: .center)
-                                    RoundedRectangle(cornerRadius: 25.0)
-                                        .foregroundColor(.black)
-                                        .opacity(0.7)
-                                        .frame(width: 80, height: 40, alignment: .center)
-                                    Button {
-                                        //action
-                                    } label: {
-                                        Text(digit6)
-                                            .font(.system(size: 32))
-                                            .foregroundColor(.white)
-                                    }
-                                }
-                            }
-                            
-                            HStack {
-                                // bottom row digit
-                                ZStack {
-                                    // D7
-                                    RoundedRectangle(cornerRadius: 25.0)
-                                        .foregroundColor(.black)
-                                        .opacity(0.5)
-                                        .frame(width: 100, height: 50, alignment: .center)
-                                    RoundedRectangle(cornerRadius: 25.0)
-                                        .foregroundColor(.black)
-                                        .opacity(0.7)
-                                        .frame(width: 80, height: 40, alignment: .center)
-                                    Button {
-                                        //action
-                                    } label: {
-                                        Text(digit7)
-                                            .font(.system(size: 32))
-                                            .foregroundColor(.white)
-                                    }
-                                    
-                                }
-                                ZStack {
-                                    // D8
-                                    RoundedRectangle(cornerRadius: 25.0)
-                                        .foregroundColor(.black)
-                                        .opacity(0.5)
-                                        .frame(width: 100, height: 50, alignment: .center)
-                                    RoundedRectangle(cornerRadius: 25.0)
-                                        .foregroundColor(.black)
-                                        .opacity(0.7)
-                                        .frame(width: 80, height: 40, alignment: .center)
-                                    Button {
-                                        //action
-                                    } label: {
-                                        Text(digit8)
-                                            .font(.system(size: 32))
-                                            .foregroundColor(.white)
-                                    }
-                                }
-                                ZStack {
-                                    // D9
-                                    RoundedRectangle(cornerRadius: 25.0)
-                                        .foregroundColor(.black)
-                                        .opacity(0.5)
-                                        .frame(width: 100, height: 50, alignment: .center)
-                                    RoundedRectangle(cornerRadius: 25.0)
-                                        .foregroundColor(.black)
-                                        .opacity(0.7)
-                                        .frame(width: 80, height: 40, alignment: .center)
-                                    Button {
-                                        //action
-                                    } label: {
-                                        Text(digit9)
-                                            .font(.system(size: 32))
-                                            .foregroundColor(.white)
-                                    }
-                                    
-                                }
-                            }
-                        } // end Group Digits
+                            Text(cHorz)                                                                    .opacity(isVertFormulaVisible ? 1.0 : 0.0)
+                        }
+                        
+                        .offset(x: -55, y: 60.0)
                         
                         
-                        // background Left and Right <<  >> buttons
+                        
+                        // .offset(x: -55, y: 30.0)
+                        
+                    } //end ZSt Top Display TEXT
+                    .opacity(isTopDisplayVisible ? 1.0 : 0.0)
+                    .font(.system(size: 44))
+                    
+                    
+                }  //end ZSt Top Display
+                
+                // MARK: - MIDDLE DISPLAY
+                // background black Middle display for animated Question / menu
+                ZStack {
+                    // background
+                    RoundedRectangle(cornerRadius: 25.0)
+                        .foregroundColor(.black)
+                        .frame(width: 350, height: 140)
+                        .opacity(0.8)
+                    // text Layer:
+                    VStack {
+                        Text(titleMidDisplay)
+                            .opacity(isMidDisplayVisible ? 1.0 : 0.0)
+                            .foregroundColor(.white)
+                            .bold()
+                        Text(textPresented)
+                            .opacity(isMidDisplayVisible ? 1.0 : 0.0)
+                            .font(isMenuVisible ? .uppercaseSmallCaps(.headline)() : .body)
+                            .foregroundColor(.white)
+                            .frame(width: 300, height: 100)
+                    }
+                }
+                
+                
+                // MARK: - Digits
+                VStack {
+                    //  background for interaction buttons / digits
+                    Group {
                         HStack {
+                            // Toprow digit
+                            // TODO: replace repeat Digit button code w a struct
                             
                             ZStack {
+                                // D1
                                 RoundedRectangle(cornerRadius: 25.0)
-                                    .foregroundColor(.blue)
+                                    .foregroundColor((currentGameState == GameState.menuScreen && currentMenuItemSelect == 1) ? .white : .black)
+                                    .animation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true), value: (currentGameState == GameState.menuScreen && currentMenuItemSelect == 1))
                                     .opacity(0.5)
-                                    .frame(width: 80, height: 50, alignment: .center)
+                                    .frame(width: 100, height: 50, alignment: .center)
                                 RoundedRectangle(cornerRadius: 25.0)
-                                    .foregroundColor(.blue)
+                                    .foregroundColor(.black)
                                     .opacity(0.7)
-                                    .frame(width: 60, height: 40, alignment: .center)
+                                    .frame(width: 80, height: 40, alignment: .center)
                                 Button {
                                     //action
                                 } label: {
-                                    Text(digitL)
+                                    Text(digit1)
+                                        .opacity(areDigitsVisible ? 1.0 : 0.0)
                                         .font(.system(size: 32))
                                         .foregroundColor(.white)
                                 }
                             }
-                            
+                            ZStack {
+                                // D2
+                                RoundedRectangle(cornerRadius: 25.0)
+                                    .foregroundColor(.black)
+                                    .opacity(0.5)
+                                    .frame(width: 100, height: 50, alignment: .center)
+                                RoundedRectangle(cornerRadius: 25.0)
+                                    .foregroundColor(.black)
+                                    .opacity(0.7)
+                                    .frame(width: 80, height: 40, alignment: .center)
+                                Button {
+                                    //action
+                                } label: {
+                                    Text(digit2)
+                                        .opacity(areDigitsVisible ? 1.0 : 0.0)
+                                        .font(.system(size: 32))
+                                        .foregroundColor(isMenuVisible ? .gray : .white)
+                                }
+                            }
+                            ZStack {
+                                // D3
+                                RoundedRectangle(cornerRadius: 25.0)
+                                    .foregroundColor((currentGameState == GameState.menuScreen && currentMenuItemSelect == 3) ? .white : .black)
+                                    .opacity(0.5)
+                                    .frame(width: 100, height: 50, alignment: .center)
+                                RoundedRectangle(cornerRadius: 25.0)
+                                    .foregroundColor(.black)
+                                    .opacity(0.7)
+                                    .frame(width: 80, height: 40, alignment: .center)
+                                Button {
+                                    //action
+                                } label: {
+                                    Text(digit3)
+                                        .opacity(areDigitsVisible ? 1.0 : 0.0)
+                                        .font(.system(size: 32))
+                                        .foregroundColor(.white)
+                                }
+                            }
+                        }
+                        
+                        HStack {
+                            // midrow digit
+                            ZStack {
+                                // D4
+                                RoundedRectangle(cornerRadius: 25.0)
+                                    .foregroundColor((currentGameState == GameState.menuScreen && currentMenuItemSelect == 4) ? .white : .black)                                    .opacity(0.5)
+                                    .frame(width: 100, height: 50, alignment: .center)
+                                RoundedRectangle(cornerRadius: 25.0)
+                                    .foregroundColor(.black)
+                                    .opacity(0.7)
+                                    .frame(width: 80, height: 40, alignment: .center)
+                                Button {
+                                    //action
+                                } label: {
+                                    Text(digit4)
+                                        .opacity(areDigitsVisible ? 1.0 : 0.0)
+                                        .font(.system(size: 32))
+                                        .foregroundColor(.white)
+                                }
+                            }
+                            ZStack {
+                                // D5
+                                RoundedRectangle(cornerRadius: 25.0)
+                                    .foregroundColor(.black)
+                                    .opacity(0.5)
+                                    .frame(width: 100, height: 50, alignment: .center)
+                                RoundedRectangle(cornerRadius: 25.0)
+                                    .foregroundColor(.black)
+                                    .opacity(0.7)
+                                    .frame(width: 80, height: 40, alignment: .center)
+                                Button {
+                                    //action
+                                } label: {
+                                    Text(digit5)
+                                        .opacity(areDigitsVisible ? 1.0 : 0.0)
+                                        .font(.system(size: 32))
+                                        .foregroundColor(isMenuVisible ? .gray : .white)
+                                }
+                            }
+                            ZStack {
+                                // D6
+                                RoundedRectangle(cornerRadius: 25.0)
+                                    .foregroundColor((currentGameState == GameState.menuScreen && currentMenuItemSelect == 6) ? .white : .black)                                    .opacity(0.5)
+                                    .frame(width: 100, height: 50, alignment: .center)
+                                RoundedRectangle(cornerRadius: 25.0)
+                                    .foregroundColor(.black)
+                                    .opacity(0.7)
+                                    .frame(width: 80, height: 40, alignment: .center)
+                                Button {
+                                    //action
+                                } label: {
+                                    Text(digit6)
+                                        .opacity(areDigitsVisible ? 1.0 : 0.0)
+                                        .font(.system(size: 32))
+                                        .foregroundColor(.white)
+                                }
+                            }
+                        }
+                        
+                        HStack {
+                            // bottom row digit
+                            ZStack {
+                                // D7
+                                RoundedRectangle(cornerRadius: 25.0)
+                                    .foregroundColor(.black)
+                                    .opacity(0.5)
+                                    .frame(width: 100, height: 50, alignment: .center)
+                                RoundedRectangle(cornerRadius: 25.0)
+                                    .foregroundColor(.black)
+                                    .opacity(0.7)
+                                    .frame(width: 80, height: 40, alignment: .center)
+                                Button {
+                                    //action
+                                } label: {
+                                    Text(digit7)
+                                        .opacity(areDigitsVisible ? 1.0 : 0.0)
+                                        .font(.system(size: 32))
+                                        .foregroundColor(isMenuVisible ? .gray : .white)
+                                }
+                                
+                            }
+                            ZStack {
+                                // D8
+                                RoundedRectangle(cornerRadius: 25.0)
+                                    .foregroundColor(.black)
+                                    .opacity(0.5)
+                                    .frame(width: 100, height: 50, alignment: .center)
+                                RoundedRectangle(cornerRadius: 25.0)
+                                    .foregroundColor(.black)
+                                    .opacity(0.7)
+                                    .frame(width: 80, height: 40, alignment: .center)
+                                Button {
+                                    //action
+                                } label: {
+                                    Text(digit8)
+                                        .opacity(areDigitsVisible ? 1.0 : 0.0)
+                                        .font(.system(size: 32))
+                                        .foregroundColor(isMenuVisible ? .gray : .white)
+                                }
+                            }
                             ZStack {
                                 // D9
                                 RoundedRectangle(cornerRadius: 25.0)
@@ -354,67 +361,115 @@ struct ContentView: View {
                                 Button {
                                     //action
                                 } label: {
-                                    Text(digit)
+                                    Text(digit9)
+                                        .opacity(areDigitsVisible ? 1.0 : 0.0)
                                         .font(.system(size: 32))
-                                        .foregroundColor(.white)
+                                        .foregroundColor(isMenuVisible ? .gray : .white)
                                 }
-                            }
-                            ZStack {
-                                RoundedRectangle(cornerRadius: 25.0)
-                                    .foregroundColor(.blue)
-                                    .opacity(0.5)
-                                    .frame(width: 80, height: 50, alignment: .center)
-                                RoundedRectangle(cornerRadius: 25.0)
-                                    .foregroundColor(.blue)
-                                    .opacity(0.7)
-                                    .frame(width: 60, height: 40, alignment: .center)
-                                Button {
-                                    //action
-                                } label: {
-                                    Text(digitR)
-                                        .font(.system(size: 32))
-                                        .foregroundColor(.white)
-                                }
+                                
                             }
                         }
-                        .padding(.init(top: 0.0, leading: 50.0, bottom: 0.0, trailing: 50.0))
+                    } // end Group Digits
+                    
+                    
+                    // background Left and Right <<  >> buttons
+                    HStack {
                         
-                        // Go action button or Return button
-                        //background 'spacebar' enter / Go button
                         ZStack {
                             RoundedRectangle(cornerRadius: 25.0)
-                                .foregroundColor(.black)
+                                .foregroundColor(.blue)
                                 .opacity(0.5)
-                                .frame(width: 220, height: 60, alignment: .center)
+                                .frame(width: 80, height: 50, alignment: .center)
                             RoundedRectangle(cornerRadius: 25.0)
-                                .foregroundColor(.white)
-                                .opacity(0.8)
-                                .frame(width: 200, height: 45, alignment: .center)
+                                .foregroundColor(.blue)
+                                .opacity(0.7)
+                                .frame(width: 60, height: 40, alignment: .center)
                             Button {
                                 //action
                             } label: {
-                                Text(spaceBar)
+                                Text(digitL)
+                                    .opacity(areDigitsVisible ? 1.0 : 0.0)
                                     .font(.system(size: 32))
-                                    .foregroundColor(.black)
+                                    .foregroundColor(.white)
                             }
-                        } .padding(.init(top: 0.0, leading: 60.0, bottom: 0.0, trailing: 60.0))
-                        
                         }
+                        
+                        ZStack {
+                            // D9
+                            RoundedRectangle(cornerRadius: 25.0)
+                                .foregroundColor(.black)
+                                .opacity(0.5)
+                                .frame(width: 100, height: 50, alignment: .center)
+                            RoundedRectangle(cornerRadius: 25.0)
+                                .foregroundColor(.black)
+                                .opacity(0.7)
+                                .frame(width: 80, height: 40, alignment: .center)
+                            Button {
+                                //action
+                            } label: {
+                                Text(digit)
+                                    .opacity(areDigitsVisible ? 1.0 : 0.0)
+                                    .font(.system(size: 32))
+                                    .foregroundColor(isMenuVisible ? .gray : .white)
+                            }
+                        }
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 25.0)
+                                .foregroundColor(.blue)
+                                .opacity(0.5)
+                                .frame(width: 80, height: 50, alignment: .center)
+                            RoundedRectangle(cornerRadius: 25.0)
+                                .foregroundColor(.blue)
+                                .opacity(0.7)
+                                .frame(width: 60, height: 40, alignment: .center)
+                            Button {
+                                //action
+                            } label: {
+                                Text(digitR)
+                                    .opacity(areDigitsVisible ? 1.0 : 0.0)
+                                    .font(.system(size: 32))
+                                    .foregroundColor(.white)
+                            }
+                        }
+                    }
+                    .padding(.init(top: 0.0, leading: 50.0, bottom: 0.0, trailing: 50.0))
+                    
+                    // Go action button or Return button
+                    //background 'spacebar' enter / Go button
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 25.0)
+                            .foregroundColor(.black)
+                            .opacity(0.5)
+                            .frame(width: 220, height: 60, alignment: .center)
+                        RoundedRectangle(cornerRadius: 25.0)
+                            .foregroundColor(.white)
+                            .opacity(0.8)
+                            .frame(width: 200, height: 45, alignment: .center)
+                        Button {
+                            //action
+                        } label: {
+                            Text(spaceBar)
+                                .opacity(areDigitsVisible ? 1.0 : 0.0)
+                                .font(.system(size: 32))
+                                .foregroundColor(isMenuVisible ? .green : .black)
+                        }
+                    } .padding(.init(top: 0.0, leading: 60.0, bottom: 0.0, trailing: 60.0))
                     
                 }
                 
-                .padding()
-           
-        
-                
-            } // endZStack
-        
+            }
             
-        } // end someView
-    
-    
-    
-    
+            .padding()
+            
+            
+            
+        } // endZStack User INterface
+        .onAppear {
+            currentGameState = GameState.startScreen
+            bootGame()
+        }
+        
+    } // end someView
     
     
     
@@ -424,16 +479,141 @@ struct ContentView: View {
     /*                                                               */
     /* ************************************************************* */
     
+    func bootGame() {
+        // TODO: checkPreferences
+        isTopDisplayVisible = false
+        isHorzFormulaVisible = false
+        isMidDisplayVisible = false
+        isVertFormulaVisible = false
+        areDigitsVisible = false
+        isMenuVisible = false
+        
+        presentDisplays(time: 1.8)
+    }
+    
+    func presentDisplays(time: Double) {
+        // with a delay using a timer set bools to true to turn on Top Mid Digit Displays
+        
+        var timings = [0.0]
+        let timeInTenths = time / 10
+        
+        // create an array for times to be used in the number of disp1 timers below based on Input
+        for _ in 0...5 {
+            if let lastElement = timings.last {
+                let correctedTiming = lastElement + timeInTenths
+                timings.append(correctedTiming)
+            }
+        }
+        
+        isMidDisplayVisible = true
+        presentTextAnimated(text: "version 1.2 Day 35 Challenge .. 100DaysOfSwiftUI")
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+            withAnimation {
+                // these timers load texts up in the beginning
+                for _ in 0...timings.count {
+                    // TODO: make a simpler for loop
+                    DispatchQueue.main.asyncAfter(deadline: .now() + timings[0]) {
+                        withAnimation(.linear(duration: 0.6)) {
+                            areDigitsVisible = true
+                        }
+                        DispatchQueue.main.asyncAfter(deadline: .now() +  timings[1]) {
+                            withAnimation(.linear(duration: 0.6)) {
+                                isMidDisplayVisible = true
+                                
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() +  timings[2]) {
+                                withAnimation(.linear(duration: 0.6)){
+                                    isTopDisplayVisible = true
+                                }
+                                DispatchQueue.main.asyncAfter(deadline: .now() +  timings[3]) {
+                                    withAnimation(.linear(duration: 0.4)) {
+                                        isVertFormulaVisible = true
+                                    }
+                                    DispatchQueue.main.asyncAfter(deadline: .now() +  timings[4]) {
+                                        withAnimation(.linear(duration: 0.7)) {
+                                            isHorzFormulaVisible = true
+                                        }
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                                            withAnimation {
+                                                presentTextAnimated(text:  "...  loading")
+                                                
+                                            }
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                                                withAnimation {
+                                                    presentTextAnimated(text: "...")
+                                                }
+                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                                    withAnimation {
+                                                        presentTextAnimated(text: "")
+                                                    }
+                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                                                        withAnimation {
+                                                            presentMenu()
+                                                        }
+                                                        DispatchQueue.main.asyncAfter(deadline: .now() + 7.8) {
+                                                            withAnimation {
+                                                                currentMenuItemSelect = 1
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        } // timings != nil ?
+                    }
+                }
+                
+            }
+            
+        } // end func presentDisplays
+        
+            func presentMenu() {
+                currentGameState = GameState.menuScreen
+                titleMidDisplay = "Menu"
+                isMenuVisible = true
+                let menuItems = ["1. HOW TO PLAY       ", "3. stage select ", "4. highScores        ", "6. preferences"]
+                
+                presentTextAnimated(text: """
+\(menuItems[0]) \(menuItems[1])\n
+\(menuItems[2]) \(menuItems[3])
+""")
+            }
+            
+        func presentTextAnimated(text : String) {
+            let textToBePresented = Array(text)
+            var buildingText = ""
+            
+            
+            for i in 0..<text.count {
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1 * Double(i)) {
+                    withAnimation {
+                        buildingText.append(textToBePresented[i])
+                        textPresented = buildingText
+                    }
+                }
+            }
+        }
+        
+        func buttonPressed(_ : String) {
+            
+            // check currentGameState to know what to do with what buttonPress add to each button
+            
+        }
+        
+    } //end ContentView
     
     
-} //end ContentView
-
-// MARK: - PREVIEW
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
+    // MARK: - PREVIEW
+    struct ContentView_Previews: PreviewProvider {
+        static var previews: some View {
+            ContentView()
+        }
     }
 }
-
 
 
