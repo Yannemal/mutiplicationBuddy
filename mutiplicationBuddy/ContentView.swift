@@ -67,7 +67,9 @@ struct ContentView: View {
     }
     
     @State private var isMenuVisible = false
-    @State private var currentMenuItemSelect = 0
+    @State private var currentMenuSelectionNumber = 0
+
+  // @State private var MenuSelectionCorrect = possMenuSelections[0]
     
     enum GameMode {
         case tableRun
@@ -191,8 +193,8 @@ struct ContentView: View {
                             ZStack {
                                 // D1
                                 RoundedRectangle(cornerRadius: 25.0)
-                                    .foregroundColor((currentGameState == GameState.menuScreen && currentMenuItemSelect == 1) ? .white : .black)
-                                    .animation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true), value: (currentGameState == GameState.menuScreen && currentMenuItemSelect == 1))
+                                    .foregroundColor((currentGameState == GameState.menuScreen && currentMenuSelectionNumber == 1) ? .white : .black)
+                                    .animation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true), value: (currentGameState == GameState.menuScreen && currentMenuSelectionNumber == 1))
                                     .opacity(0.5)
                                     .frame(width: 100, height: 50, alignment: .center)
                                 RoundedRectangle(cornerRadius: 25.0)
@@ -230,7 +232,8 @@ struct ContentView: View {
                             ZStack {
                                 // D3
                                 RoundedRectangle(cornerRadius: 25.0)
-                                    .foregroundColor((currentGameState == GameState.menuScreen && currentMenuItemSelect == 3) ? .white : .black)
+                                    .foregroundColor((currentGameState == GameState.menuScreen && currentMenuSelectionNumber == 3) ? .white : .black)
+                                    .animation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true), value: (currentGameState == GameState.menuScreen && currentMenuSelectionNumber == 3))
                                     .opacity(0.5)
                                     .frame(width: 100, height: 50, alignment: .center)
                                 RoundedRectangle(cornerRadius: 25.0)
@@ -253,7 +256,9 @@ struct ContentView: View {
                             ZStack {
                                 // D4
                                 RoundedRectangle(cornerRadius: 25.0)
-                                    .foregroundColor((currentGameState == GameState.menuScreen && currentMenuItemSelect == 4) ? .white : .black)                                    .opacity(0.5)
+                                    .foregroundColor((currentGameState == GameState.menuScreen && currentMenuSelectionNumber == 4) ? .white : .black)
+                                    .animation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true), value: (currentGameState == GameState.menuScreen && currentMenuSelectionNumber == 4))
+                                    .opacity(0.5)
                                     .frame(width: 100, height: 50, alignment: .center)
                                 RoundedRectangle(cornerRadius: 25.0)
                                     .foregroundColor(.black)
@@ -290,7 +295,9 @@ struct ContentView: View {
                             ZStack {
                                 // D6
                                 RoundedRectangle(cornerRadius: 25.0)
-                                    .foregroundColor((currentGameState == GameState.menuScreen && currentMenuItemSelect == 6) ? .white : .black)                                    .opacity(0.5)
+                                    .foregroundColor((currentGameState == GameState.menuScreen && currentMenuSelectionNumber == 6) ? .white : .black)
+                                    .animation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true), value: (currentGameState == GameState.menuScreen && currentMenuSelectionNumber == 6))
+                                    .opacity(0.5)
                                     .frame(width: 100, height: 50, alignment: .center)
                                 RoundedRectangle(cornerRadius: 25.0)
                                     .foregroundColor(.black)
@@ -481,12 +488,7 @@ struct ContentView: View {
     
     func bootGame() {
         // TODO: checkPreferences
-        isTopDisplayVisible = false
-        isHorzFormulaVisible = false
-        isMidDisplayVisible = false
-        isVertFormulaVisible = false
-        areDigitsVisible = false
-        isMenuVisible = false
+        changeGameState(state: .startScreen)
         
         presentDisplays(time: 1.8)
     }
@@ -539,11 +541,11 @@ struct ContentView: View {
                                                 presentTextAnimated(text:  "...  loading")
                                                 
                                             }
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                                                 withAnimation {
                                                     presentTextAnimated(text: "...")
                                                 }
-                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                                                     withAnimation {
                                                         presentTextAnimated(text: "")
                                                     }
@@ -551,9 +553,10 @@ struct ContentView: View {
                                                         withAnimation {
                                                             presentMenu()
                                                         }
-                                                        DispatchQueue.main.asyncAfter(deadline: .now() + 7.8) {
+                                                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.8) {
                                                             withAnimation {
-                                                                currentMenuItemSelect = 1
+                                                                checkCorrectMenuItemSelection(selection: 1)
+                                                                
                                                             }
                                                         }
                                                     }
@@ -568,20 +571,105 @@ struct ContentView: View {
                 }
                 
             }
-            
-        } // end func presentDisplays
+        }
+        
+    } // end func presentDisplays
         
             func presentMenu() {
+                changeGameState(state: .menuScreen)
+
+            }
+        
+        func changeGameState(state: GameState) {
+            // slowly figuring out how to apply gameStates .. and look a Switch can have multiple lines of code
+            
+            switch state {
+                
+            case .startScreen:
+                // see bootGame()
+                isTopDisplayVisible = false
+                isHorzFormulaVisible = false
+                isMidDisplayVisible = false
+                isVertFormulaVisible = false
+                areDigitsVisible = false
+                isMenuVisible = false
+                print("in StartScreen")
+                
+            case .menuScreen:
                 currentGameState = GameState.menuScreen
                 titleMidDisplay = "Menu"
                 isMenuVisible = true
-                let menuItems = ["1. HOW TO PLAY       ", "3. stage select ", "4. highScores        ", "6. preferences"]
+                print("in MenuScreen")
                 
-                presentTextAnimated(text: """
-\(menuItems[0]) \(menuItems[1])\n
-\(menuItems[2]) \(menuItems[3])
-""")
+            case .modeSelect:
+                print("code")
+            case .difficultySelect:
+                print("code")
+            case .highScoreScreen:
+                print("code")
+            case .preferencesScreen:
+                print("code")
+            case .beginRound:
+                print("code")
+            case .playRound:
+                print("code")
+            case .pauseGame:
+                print("code")
+            case .askQuestion:
+                print("code")
+            case .answerQuestion:
+                print("code")
+            case .scoreQuestion:
+                print("code")
+            case .endRound:
+                print("code")
+            case .scoreRound:
+                print("code")
+            case .scoreBoard:
+                print("code")
             }
+        }
+        
+        func checkCorrectMenuItemSelection(selection: Int) {
+            if isMenuVisible && currentGameState == GameState.menuScreen {
+                let menuItems = ["1. how to play      ", "3. stage select ", "4. highScores        ", "6. preferences"]
+                
+                let selections = [
+"""
+\(menuItems[0].uppercased()) \(menuItems[1])\n
+\(menuItems[2]) \(menuItems[3])
+""",
+
+"""
+\(menuItems[0]) \(menuItems[1].uppercased())\n
+\(menuItems[2]) \(menuItems[3])
+""",
+
+"""
+\(menuItems[0]) \(menuItems[1])\n
+\(menuItems[2].uppercased()) \(menuItems[3])
+""",
+
+"""
+\(menuItems[0]) \(menuItems[1])\n
+\(menuItems[2]) \(menuItems[3].uppercased())
+"""
+                ]
+                
+                switch selection {
+                case 1 : setMenuSelection(inTextForm: selections[0], asNumber: 1)
+                case 2 : setMenuSelection(inTextForm: selections[1], asNumber: 2)
+                case 3 : setMenuSelection(inTextForm: selections[2], asNumber: 3)
+                case 4 : setMenuSelection(inTextForm: selections[3], asNumber: 4)
+                default: textPresented = ""
+                }
+                
+                func setMenuSelection(inTextForm : String, asNumber: Int) {
+                    textPresented = inTextForm
+                    currentMenuSelectionNumber = asNumber
+                }
+            } // end if statement
+        } // endFunc checkCorrectSelectionMenu
             
         func presentTextAnimated(text : String) {
             let textToBePresented = Array(text)
@@ -614,6 +702,6 @@ struct ContentView: View {
             ContentView()
         }
     }
-}
+
 
 
