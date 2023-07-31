@@ -28,6 +28,7 @@ struct ContentView: View {
     @State private var isMidDisplayVisible = true
     @State private var titleMidDisplay = ""
     @State private var textPresented = ".."
+    @State private var isMidTextAnimating = false
     //bottom Digits
     var numbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
     @State private var areDigitsVisible = true
@@ -194,15 +195,17 @@ struct ContentView: View {
                                 // D1
                                 RoundedRectangle(cornerRadius: 25.0)
                                     .foregroundColor((currentGameState == GameState.menuScreen && currentMenuSelectionNumber == 1) ? .white : .black)
-                                    .animation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true), value: (currentGameState == GameState.menuScreen && currentMenuSelectionNumber == 1))
+                                    .animation(.easeInOut(duration: 0.6), value:(currentGameState == GameState.menuScreen && currentMenuSelectionNumber == 1))
                                     .opacity(0.5)
-                                    .frame(width: 100, height: 50, alignment: .center)
+                                    .frame(width: 100, height: 50)
+                                               
                                 RoundedRectangle(cornerRadius: 25.0)
                                     .foregroundColor(.black)
                                     .opacity(0.7)
-                                    .frame(width: 80, height: 40, alignment: .center)
+                                    .frame(width: 80, height: 40)
+                                               
                                 Button {
-                                    //action
+                                    buttonPressed(button: digit1)
                                 } label: {
                                     Text(digit1)
                                         .opacity(areDigitsVisible ? 1.0 : 0.0)
@@ -233,7 +236,7 @@ struct ContentView: View {
                                 // D3
                                 RoundedRectangle(cornerRadius: 25.0)
                                     .foregroundColor((currentGameState == GameState.menuScreen && currentMenuSelectionNumber == 3) ? .white : .black)
-                                    .animation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true), value: (currentGameState == GameState.menuScreen && currentMenuSelectionNumber == 3))
+                                    .animation(.easeInOut(duration: 0.6), value: (currentGameState == GameState.menuScreen && currentMenuSelectionNumber == 3))
                                     .opacity(0.5)
                                     .frame(width: 100, height: 50, alignment: .center)
                                 RoundedRectangle(cornerRadius: 25.0)
@@ -257,7 +260,7 @@ struct ContentView: View {
                                 // D4
                                 RoundedRectangle(cornerRadius: 25.0)
                                     .foregroundColor((currentGameState == GameState.menuScreen && currentMenuSelectionNumber == 4) ? .white : .black)
-                                    .animation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true), value: (currentGameState == GameState.menuScreen && currentMenuSelectionNumber == 4))
+                                    .animation(.easeInOut(duration: 0.6), value: (currentGameState == GameState.menuScreen && currentMenuSelectionNumber == 4))
                                     .opacity(0.5)
                                     .frame(width: 100, height: 50, alignment: .center)
                                 RoundedRectangle(cornerRadius: 25.0)
@@ -265,7 +268,7 @@ struct ContentView: View {
                                     .opacity(0.7)
                                     .frame(width: 80, height: 40, alignment: .center)
                                 Button {
-                                    //action
+                                    buttonPressed(button: digit4)
                                 } label: {
                                     Text(digit4)
                                         .opacity(areDigitsVisible ? 1.0 : 0.0)
@@ -296,7 +299,7 @@ struct ContentView: View {
                                 // D6
                                 RoundedRectangle(cornerRadius: 25.0)
                                     .foregroundColor((currentGameState == GameState.menuScreen && currentMenuSelectionNumber == 6) ? .white : .black)
-                                    .animation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true), value: (currentGameState == GameState.menuScreen && currentMenuSelectionNumber == 6))
+                                    .animation(.easeInOut(duration: 0.6), value: (currentGameState == GameState.menuScreen && currentMenuSelectionNumber == 6))
                                     .opacity(0.5)
                                     .frame(width: 100, height: 50, alignment: .center)
                                 RoundedRectangle(cornerRadius: 25.0)
@@ -304,7 +307,7 @@ struct ContentView: View {
                                     .opacity(0.7)
                                     .frame(width: 80, height: 40, alignment: .center)
                                 Button {
-                                    //action
+                                    buttonPressed(button: digit6)
                                 } label: {
                                     Text(digit6)
                                         .opacity(areDigitsVisible ? 1.0 : 0.0)
@@ -490,95 +493,39 @@ struct ContentView: View {
         // TODO: checkPreferences
         changeGameState(state: .startScreen)
         
-        presentDisplays(time: 1.8)
+        presentDisplays(time: 1.0)
     }
     
     func presentDisplays(time: Double) {
-        // with a delay using a timer set bools to true to turn on Top Mid Digit Displays
-        
-        var timings = [0.0]
-        let timeInTenths = time / 10
-        
-        // create an array for times to be used in the number of disp1 timers below based on Input
-        for _ in 0...5 {
-            if let lastElement = timings.last {
-                let correctedTiming = lastElement + timeInTenths
-                timings.append(correctedTiming)
-            }
-        }
-        
-        isMidDisplayVisible = true
-        presentTextAnimated(text: "version 1.2 Day 35 Challenge .. 100DaysOfSwiftUI")
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+     
+        DispatchQueue.main.asyncAfter(deadline: .now() + time) {
             withAnimation {
-                // these timers load texts up in the beginning
-                for _ in 0...timings.count {
-                    // TODO: make a simpler for loop
-                    DispatchQueue.main.asyncAfter(deadline: .now() + timings[0]) {
-                        withAnimation(.linear(duration: 0.6)) {
-                            areDigitsVisible = true
-                        }
-                        DispatchQueue.main.asyncAfter(deadline: .now() +  timings[1]) {
-                            withAnimation(.linear(duration: 0.6)) {
-                                isMidDisplayVisible = true
-                                
-                            }
-                            DispatchQueue.main.asyncAfter(deadline: .now() +  timings[2]) {
-                                withAnimation(.linear(duration: 0.6)){
-                                    isTopDisplayVisible = true
-                                }
-                                DispatchQueue.main.asyncAfter(deadline: .now() +  timings[3]) {
-                                    withAnimation(.linear(duration: 0.4)) {
-                                        isVertFormulaVisible = true
-                                    }
-                                    DispatchQueue.main.asyncAfter(deadline: .now() +  timings[4]) {
-                                        withAnimation(.linear(duration: 0.7)) {
-                                            isHorzFormulaVisible = true
-                                        }
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                                            withAnimation {
-                                                presentTextAnimated(text:  "...  loading")
-                                                
-                                            }
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                                                withAnimation {
-                                                    presentTextAnimated(text: "...")
-                                                }
-                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                                    withAnimation {
-                                                        presentTextAnimated(text: "")
-                                                    }
-                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                                                        withAnimation {
-                                                            presentMenu()
-                                                        }
-                                                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.8) {
-                                                            withAnimation {
-                                                                checkCorrectMenuItemSelection(selection: "1")
-                                                                
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        } // timings != nil ?
-                    }
-                }
+                isTopDisplayVisible = true
+                isVertFormulaVisible = true
+                isHorzFormulaVisible = true
+                isMidDisplayVisible = true
+                presentTextAnimated(text: "version 1.2 Day 35 Challenge \n (HINT: press 1)")
+  
+                areDigitsVisible = true
+                isMidDisplayVisible = true
                 
+                presentMenu()
+                // TODO: presentMenu() & presentDisplays() & changeGameState(.menuScreen) all overlap
             }
         }
+    
+        
+        
         
     } // end func presentDisplays
         
             func presentMenu() {
                 changeGameState(state: .menuScreen)
+                
+                        }
+                   
 
-            }
+            
         
         func changeGameState(state: GameState) {
             // slowly figuring out how to apply gameStates .. and look a Switch can have multiple lines of code
@@ -590,6 +537,7 @@ struct ContentView: View {
                 isTopDisplayVisible = false
                 isHorzFormulaVisible = false
                 isMidDisplayVisible = false
+                isMidTextAnimating = false
                 isVertFormulaVisible = false
                 areDigitsVisible = false
                 isMenuVisible = false
@@ -599,6 +547,18 @@ struct ContentView: View {
                 currentGameState = GameState.menuScreen
                 titleMidDisplay = "Menu"
                 isMenuVisible = true
+                // if previous state was startScreen then
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.3) {
+                    withAnimation {
+                        checkCorrectMenuItemSelection(selection: digit1)
+                    }
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+                    withAnimation {
+                        // nameView
+                    }
+                }
+                
                 print("changed to MenuScreen")
                 
             case .modeSelect:
@@ -632,51 +592,61 @@ struct ContentView: View {
         
         func checkCorrectMenuItemSelection(selection: String) {
             if isMenuVisible && currentGameState == GameState.menuScreen {
-                let menuItems = ["1. how to play      ", "3. stage select ", "4. highScores        ", "6. preferences"]
                 
-                let selections = [
-"""
-\(menuItems[0].uppercased()) \(menuItems[1])\n
-\(menuItems[2]) \(menuItems[3])
-""",
-
-"""
-\(menuItems[0]) \(menuItems[1].uppercased())\n
-\(menuItems[2]) \(menuItems[3])
-""",
-
-"""
-\(menuItems[0]) \(menuItems[1])\n
-\(menuItems[2].uppercased()) \(menuItems[3])
-""",
-
-"""
-\(menuItems[0]) \(menuItems[1])\n
-\(menuItems[2]) \(menuItems[3].uppercased())
-"""
-                ]
-//                if let selectionUnwrapped = selection {
-                    switch selection {
-                    case digit1 : setMenuSelection(inTextForm: selections[0], asNumber: 1)
-                    case digit3 : setMenuSelection(inTextForm: selections[1], asNumber: 2)
-                    case digit4 : setMenuSelection(inTextForm: selections[2], asNumber: 3)
-                    case digit4 : setMenuSelection(inTextForm: selections[3], asNumber: 4)
-                    default: textPresented = ""
-                        print("error button press : \(selection)")
-                    }
+                if selection == digit1 || selection == digit3 || selection == digit4 || selection == digit6 {
+                    // check out my OR operators !
                     
-                    func setMenuSelection(inTextForm : String, asNumber: Int) {
-                        textPresented = inTextForm
-                        currentMenuSelectionNumber = asNumber
-                    }
+                    let menuItems = ["1. how to play      ", "3. stage select ", "4. highScores        ", "6. preferences"]
+                    
+                    let selections = [
+    """
+    \(menuItems[0].uppercased()) \(menuItems[1])\n
+    \(menuItems[2]) \(menuItems[3])
+    """,
+
+    """
+    \(menuItems[0]) \(menuItems[1].uppercased())\n
+    \(menuItems[2]) \(menuItems[3])
+    """,
+
+    """
+    \(menuItems[0]) \(menuItems[1])\n
+    \(menuItems[2].uppercased()) \(menuItems[3])
+    """,
+
+    """
+    \(menuItems[0]) \(menuItems[1])\n
+    \(menuItems[2]) \(menuItems[3].uppercased())
+    """
+                    ]
+    //                if let selectionUnwrapped = selection {
+                        switch selection {
+                        case digit1 : setMenuSelection(inTextForm: selections[0], asNumber: 1)
+                        case digit3 : setMenuSelection(inTextForm: selections[1], asNumber: 3)
+                        case digit4 : setMenuSelection(inTextForm: selections[2], asNumber: 4)
+                        case digit6 : setMenuSelection(inTextForm: selections[3], asNumber: 6)
+                        default: textPresented = ""
+                            print("error button press : \(selection)")
+                        }
+                        
+                        func setMenuSelection(inTextForm : String, asNumber: Int) {
+                            
+                            textPresented = inTextForm
+                            currentMenuSelectionNumber = asNumber
+                            print("new \(currentMenuSelectionNumber)")
+                        }
+                }
+               
                 //}
             } // end if statement
         } // endFunc checkCorrectSelectionMenu
             
-        func presentTextAnimated(text : String) {
+    func presentTextAnimated(text : String) {
+        if isMidTextAnimating == false {
             let textToBePresented = Array(text)
             var buildingText = ""
-            
+            var trackLoop : Int = 0
+            isMidTextAnimating = true
             
             for i in 0..<text.count {
                 
@@ -686,9 +656,18 @@ struct ContentView: View {
                         textPresented = buildingText
                     }
                 }
+                if trackLoop < text.count {
+                    trackLoop += 1
+                } else {
+                    isMidTextAnimating = false
+                }
             }
+        } else {
+            print("badTime for animatingText")
+            // TODO: calculate timer needed and call func within func if poss to delay a 2nd attempt.
+            
         }
-        
+    }
         func buttonPressed(button : String) {
             
             // check currentGameState to know what to do with what buttonPress add to each button
@@ -699,6 +678,7 @@ struct ContentView: View {
                 print("buttonpressed in StartScreen")
                 
             case .menuScreen:
+                
                 
                 checkCorrectMenuItemSelection(selection: button)
                 
