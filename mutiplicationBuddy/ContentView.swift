@@ -175,7 +175,7 @@ struct ContentView: View {
                             .bold()
                         Text(textPresented)
                             .opacity(isMidDisplayVisible ? 1.0 : 0.0)
-                            .font(isMenuVisible ? .uppercaseSmallCaps(.headline)() : .body)
+                            .font(.body)
                             .foregroundColor(.white)
                             .frame(width: 300, height: 100)
                     }
@@ -241,7 +241,7 @@ struct ContentView: View {
                                     .opacity(0.7)
                                     .frame(width: 80, height: 40, alignment: .center)
                                 Button {
-                                    //action
+                                    buttonPressed(button: digit3)
                                 } label: {
                                     Text(digit3)
                                         .opacity(areDigitsVisible ? 1.0 : 0.0)
@@ -555,7 +555,7 @@ struct ContentView: View {
                                                         }
                                                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.8) {
                                                             withAnimation {
-                                                                checkCorrectMenuItemSelection(selection: 1)
+                                                                checkCorrectMenuItemSelection(selection: "1")
                                                                 
                                                             }
                                                         }
@@ -593,44 +593,44 @@ struct ContentView: View {
                 isVertFormulaVisible = false
                 areDigitsVisible = false
                 isMenuVisible = false
-                print("in StartScreen")
+                 print("changed to StartScreen")
                 
             case .menuScreen:
                 currentGameState = GameState.menuScreen
                 titleMidDisplay = "Menu"
                 isMenuVisible = true
-                print("in MenuScreen")
+                print("changed to MenuScreen")
                 
             case .modeSelect:
-                print("code")
+                print("changed to ModeSelect")
             case .difficultySelect:
-                print("code")
+                print("changed to difficulty Select")
             case .highScoreScreen:
-                print("code")
+                print("changed to highdscore screen")
             case .preferencesScreen:
-                print("code")
+                print("changed to preference screen")
             case .beginRound:
-                print("code")
+                print("changed to begin round")
             case .playRound:
-                print("code")
+                print("changed to playRound")
             case .pauseGame:
-                print("code")
+                print("changed to pauseGame")
             case .askQuestion:
-                print("code")
+                print("changed to askQuestion")
             case .answerQuestion:
-                print("code")
+                print("changed to answerQuestiom")
             case .scoreQuestion:
-                print("code")
+                print("changed to ScoreQuestion")
             case .endRound:
-                print("code")
+                print("changed to endRound")
             case .scoreRound:
-                print("code")
+                print("changed to scroeRound")
             case .scoreBoard:
-                print("code")
+                print("changed to sccoreBoard")
             }
         }
         
-        func checkCorrectMenuItemSelection(selection: Int) {
+        func checkCorrectMenuItemSelection(selection: String) {
             if isMenuVisible && currentGameState == GameState.menuScreen {
                 let menuItems = ["1. how to play      ", "3. stage select ", "4. highScores        ", "6. preferences"]
                 
@@ -655,19 +655,21 @@ struct ContentView: View {
 \(menuItems[2]) \(menuItems[3].uppercased())
 """
                 ]
-                
-                switch selection {
-                case 1 : setMenuSelection(inTextForm: selections[0], asNumber: 1)
-                case 2 : setMenuSelection(inTextForm: selections[1], asNumber: 2)
-                case 3 : setMenuSelection(inTextForm: selections[2], asNumber: 3)
-                case 4 : setMenuSelection(inTextForm: selections[3], asNumber: 4)
-                default: textPresented = ""
-                }
-                
-                func setMenuSelection(inTextForm : String, asNumber: Int) {
-                    textPresented = inTextForm
-                    currentMenuSelectionNumber = asNumber
-                }
+//                if let selectionUnwrapped = selection {
+                    switch selection {
+                    case digit1 : setMenuSelection(inTextForm: selections[0], asNumber: 1)
+                    case digit3 : setMenuSelection(inTextForm: selections[1], asNumber: 2)
+                    case digit4 : setMenuSelection(inTextForm: selections[2], asNumber: 3)
+                    case digit4 : setMenuSelection(inTextForm: selections[3], asNumber: 4)
+                    default: textPresented = ""
+                        print("error button press : \(selection)")
+                    }
+                    
+                    func setMenuSelection(inTextForm : String, asNumber: Int) {
+                        textPresented = inTextForm
+                        currentMenuSelectionNumber = asNumber
+                    }
+                //}
             } // end if statement
         } // endFunc checkCorrectSelectionMenu
             
@@ -687,11 +689,52 @@ struct ContentView: View {
             }
         }
         
-        func buttonPressed(_ : String) {
+        func buttonPressed(button : String) {
             
             // check currentGameState to know what to do with what buttonPress add to each button
-            
-        }
+            switch currentGameState {
+                
+            case .startScreen:
+               
+                print("buttonpressed in StartScreen")
+                
+            case .menuScreen:
+                
+                checkCorrectMenuItemSelection(selection: button)
+                
+               // print("button \(button) pressed in MenuScreen")
+                
+                
+            case .modeSelect:
+                print("button \(button) pressed in ModeSelect")
+            case .difficultySelect:
+                print("button \(button) pressed in difficulty Select")
+            case .highScoreScreen:
+                print("button \(button) pressed in highdscore screen")
+            case .preferencesScreen:
+                print("button \(button) pressed in preference screen")
+            case .beginRound:
+                print("button \(button) pressed in begin round")
+            case .playRound:
+                print("button \(button) pressed in playRound")
+            case .pauseGame:
+                print("button \(button) pressed in pauseGame")
+            case .askQuestion:
+                print("button \(button) pressed in askQuestion")
+            case .answerQuestion:
+                print("button \(button) pressed in answerQuestiom")
+            case .scoreQuestion:
+                print("button \(button) pressed inScoreQuestion")
+            case .endRound:
+                print("button \(button) pressed in endRound")
+            case .scoreRound:
+                print("button \(button) pressed in scroeRound")
+            case .scoreBoard:
+                print("button \(button) pressed in sccoreBoard")
+            }
+        } // end fun buttonpress
+    
+        
         
     } //end ContentView
     
