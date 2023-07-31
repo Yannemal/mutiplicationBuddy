@@ -18,3 +18,5 @@ version 1 : single screen everything
 version 2: design + animation 
 
 version 3: push to different paths in NavStack 
+
+![Screenshot 2023-07-31 at 01 36 55](https://github.com/Yannemal/mutiplicationBuddy/assets/56878180/c0e6449b-b84e-40e9-add5-dfec633288a1)
